@@ -1,0 +1,73 @@
+setwd("c:/data/BUAN6356/HW_4"); source("prep.txt", echo=T)
+
+# setwd("~/Library/Mobile Documents/com~apple~CloudDocs/School Work/Sem 1/BUAN6356/BUAN6356_S02/data")
+require(data.table)
+require(partykit)
+require(broom)
+
+rm(list=ls())
+
+seed <- 553624401
+set.seed(seed)
+
+raw <- fread(file="student_default_ISLR.csv")
+
+str(raw)
+
+wk <- raw
+
+tmp <- raw$balance*0
+tmp
+tmp[raw$default == 'Yes'] <- 1
+wk$default <- tmp
+table(wk$default,tmp)
+str(wk)
+
+wk$student <- as.factor(wk$student)
+
+View(wk)
+
+mbrCutoff <- 0.5
+
+tstFrac <- 0.1
+
+nTst<- ceiling(nrow(wk)*tstFrac)
+nTst
+nrow(wk)
+
+tst <- sample(nrow(wk),nTst)
+tst
+
+lBase <- glm(default~., family=binomial, data=wk[-tst])
+summary(lBase)
+
+tidy(lBase)
+
+lBaseTst <- predict(lBase, newdata=wk[tst], type="response")
+lBaseTst
+
+lBaseTstCls <- lBaseTst*0
+t <- lBaseTst>=mbrCutoff
+lBaseTstCls[t] <- 1
+lBaseTstCls
+
+summary(lBaseTstCls)
+
+tBase <- ctree(default~., data=wk[-tst],)
+tBase
+plot(tBase)
+
+tBaseTst <- predict(tBase,data = wk[tst])
+tBaseTst
+
+tBaseTst <- predict(tBase,newdata = wk[tst])
+tBaseTst
+
+summary(tBaseTst)
+
+tBaseTstCls <- tBaseTst*0
+t <- tBaseTst >= mbrCutoff
+tBaseTstCls[t] <- 1
+summary(tBaseTstCls)
+
+source("validate.txt", echo=T)

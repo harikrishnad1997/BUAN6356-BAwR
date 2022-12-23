@@ -1,0 +1,59 @@
+
+setwd("c:/data/BUAN6356/HW_5"); source("prep.txt", echo=T)
+#setwd("~/Library/Mobile Documents/com~apple~CloudDocs/School Work/Sem 1/BUAN6356/BUAN6356_S02/data")
+
+# Cleaning R environment
+
+# rm(list=ls())
+
+require(data.table)
+
+# Q1 Creating seed value
+
+seed <- 822555949
+
+# Q2 Establishing minimum number of cluster
+
+minClust <- 1
+
+# Q3 Establishing maximum number of cluster
+
+maxClust <- 10
+
+# Q4 number of starting iterations in kmeans()
+
+nst <- 5
+
+# Q5 working data as read
+
+wk <- read.csv("HW_5.csv")
+
+# str(wk)
+
+# Q6 vector of total within-sum-of-squares values for kmeans() scenarios
+
+wk1 <- na.omit(wk)
+wk1 <- scale(wk1)
+
+kWSS       <- rep(-1,maxClust)
+
+for (k in minClust:maxClust) {
+  set.seed(seed)
+  kWSS[k] <- kmeans(wk1, k, nstart=nst)$tot.withinss
+}
+#kWSS
+
+# Q7 vector of total within-sum-of-squares values for hclust() scenarios
+
+hWSS       <- rep(-1,maxClust)
+
+hc       <- hclust(dist(wk1)^2)
+#plot(hc)
+for (k in minClust:maxClust) {
+  dt    <- data.table(idx=1:nrow(wk), grp=cutree(hc,k))
+  wss   <- dt[,sum(scale(wk1[idx,],center=T,scale=F)^2), by=grp]
+  hWSS[k] <- sum(wss$V1)
+}
+#hWSS
+
+source("validate.txt", echo=T)

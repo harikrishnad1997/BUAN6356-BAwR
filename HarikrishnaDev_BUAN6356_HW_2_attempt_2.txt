@@ -1,0 +1,68 @@
+
+# Assignment - 2
+# BUAN 6356
+
+# Removing all objects from R environment
+rm(list=ls())
+
+# Setting directory and prereqs for code
+
+setwd("c:/data/BUAN6356/HW_2"); source("prep.txt", echo=T)
+
+# Adding MASS library
+
+# install.packages(MASS)
+library(MASS)
+
+# Q1
+# Adding Boston data into the environment
+
+data(Boston)
+View(Boston)
+
+# Q2
+# Removing incomplete records
+
+wk <- Boston[complete.cases(Boston),]
+
+# Q3
+# Setting seed values for the model
+
+seed <- 722538843
+set.seed(seed)
+
+# Q4
+# number of index values in testing sample
+
+sample_size <- 0.10
+tNum<- ceiling(nrow(wk)*sample_size)
+
+# Q5
+# index values of 10% testing sample
+
+tst <- sample(nrow(wk),tNum)
+
+# Q6
+# predicted values from baseline model (training set)
+
+mBase <- lm(medv~., data = wk[-tst,])
+summary(mBase)
+predBase <- predict(mBase,wk[-tst,])
+# View(predBase)
+
+# Q7
+# predicted values from stepwise model (training set)
+
+tStep <-step(mBase)
+summary(tStep)
+predStep <- predict(tStep,wk[-tst,])
+# View(predStep)
+
+# Q8
+# predicted values for stepwise model (testing sample)
+
+tstPredS <- predict(tStep,wk[tst,])
+
+# Code prerequiste
+
+source("validate.txt", echo=T)

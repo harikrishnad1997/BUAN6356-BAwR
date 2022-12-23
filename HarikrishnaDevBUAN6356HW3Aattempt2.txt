@@ -1,0 +1,31 @@
+
+#Setting working directory
+
+setwd("c:/data/BUAN6356/HW_3"); source("prep.txt", echo=T)
+#setwd("~/Library/Mobile Documents/com~apple~CloudDocs/School Work/Sem 1/BUAN6356/BUAN6356_S02/data")
+getwd()
+
+require(data.table)
+
+#Adding data into a vector called 'raw'
+
+raw <- fread(file="dobson_covariance_6_12_mod.txt")
+
+# raw <- read.csv("dobson_covariance_6_12_mod.txt")
+
+str(raw)
+
+# Creating vector with predicted values for Null model
+
+demo <- T
+
+#(mf1 <- model.matrix(achievement~1, data=raw) )  # design matrix
+m1   <- lm(achievement~1, data=raw)              # fit model
+summary(m1)                                      # expanded result
+m0Pred <- m1$fitted.values
+m0Pred
+if (demo) { print(mean(raw$achievement) )
+  str(m1)               }              # comparison to m1
+
+
+source("validate.txt", echo=T)
